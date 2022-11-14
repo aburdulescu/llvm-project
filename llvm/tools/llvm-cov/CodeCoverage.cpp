@@ -14,6 +14,7 @@
 
 #include "CoverageExporterJson.h"
 #include "CoverageExporterLcov.h"
+#include "CoverageExporterXml.h"
 #include "CoverageFilters.h"
 #include "CoverageReport.h"
 #include "CoverageSummaryInfo.h"
@@ -650,7 +651,9 @@ int CodeCoverageTool::run(Command Cmd, int argc, const char **argv) {
                  clEnumValN(CoverageViewOptions::OutputFormat::HTML, "html",
                             "HTML output"),
                  clEnumValN(CoverageViewOptions::OutputFormat::Lcov, "lcov",
-                            "lcov tracefile output")),
+                            "lcov tracefile output"),
+                 clEnumValN(CoverageViewOptions::OutputFormat::XML, "xml",
+                            "XML output(Cobertura format)")),
       cl::init(CoverageViewOptions::OutputFormat::Text));
 
   cl::opt<std::string> PathRemap(
@@ -1205,9 +1208,10 @@ int CodeCoverageTool::doExport(int argc, const char **argv,
   ViewOpts.SkipBranches = SkipBranches;
 
   if (ViewOpts.Format != CoverageViewOptions::OutputFormat::Text &&
-      ViewOpts.Format != CoverageViewOptions::OutputFormat::Lcov) {
-    error("Coverage data can only be exported as textual JSON or an "
-          "lcov tracefile.");
+      ViewOpts.Format != CoverageViewOptions::OutputFormat::Lcov &&
+      ViewOpts.Format != CoverageViewOptions::OutputFormat::XML) {
+    error("Coverage data can only be exported as textual JSON, "
+          "lcov tracefile or XML cobertura.");
     return 1;
   }
 
@@ -1237,6 +1241,10 @@ int CodeCoverageTool::doExport(int argc, const char **argv,
   case CoverageViewOptions::OutputFormat::Lcov:
     Exporter = std::make_unique<CoverageExporterLcov>(*Coverage.get(),
                                                        ViewOpts, outs());
+    break;
+  case CoverageViewOptions::OutputFormat::XML:
+      Exporter = std::make_unique<CoverageExporterXml>(*Coverage.get(),
+                                                        ViewOpts, outs());
     break;
   }
 

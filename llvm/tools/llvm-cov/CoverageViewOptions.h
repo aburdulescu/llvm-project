@@ -20,7 +20,8 @@ struct CoverageViewOptions {
   enum class OutputFormat {
     Text,
     HTML,
-    Lcov
+    Lcov,
+    XML,
   };
 
   enum class BranchOutputType { Count, Percent, Off };

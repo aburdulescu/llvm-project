@@ -83,6 +83,8 @@ CoveragePrinter::create(const CoverageViewOptions &Opts) {
     // Unreachable because CodeCoverage.cpp should terminate with an error
     // before we get here.
     llvm_unreachable("Lcov format is not supported!");
+  case CoverageViewOptions::OutputFormat::XML:
+    llvm_unreachable("XML format is not supported!");
   }
   llvm_unreachable("Unknown coverage output format!");
 }
@@ -150,6 +152,8 @@ SourceCoverageView::create(StringRef SourceName, const MemoryBuffer &File,
   case CoverageViewOptions::OutputFormat::Lcov:
     // Unreachable because CodeCoverage.cpp should terminate with an error
     // before we get here.
+    llvm_unreachable("Lcov format is not supported!");
+  case CoverageViewOptions::OutputFormat::XML:
     llvm_unreachable("Lcov format is not supported!");
   }
   llvm_unreachable("Unknown coverage output format!");
