@@ -155,11 +155,31 @@ void renderFooter(raw_ostream &OS) {
   OS << "</coverage>";
 }
 
+std::size_t replaceAll(std::string &Inout, std::string_view What,
+                       std::string_view With) {
+  std::size_t Count{};
+  for (std::string::size_type Pos{};
+       Inout.npos != (Pos = Inout.find(What.data(), Pos, What.length()));
+       Pos += With.length(), ++Count) {
+    Inout.replace(Pos, What.length(), With.data(), With.length());
+  }
+  return Count;
+}
+
 void renderFile(raw_ostream &OS, const coverage::CoverageMapping &Coverage,
                 const std::string &Filename,
                 const FileCoverageSummary &FileReport,
                 const CoverageViewOptions &Options) {
-  OS << "<class name=\"\" filename=\"" << Filename << "\"";
+  std::string Name;
+  if (Filename.front() == '/')
+    Name = Filename.substr(1);
+  else
+    Name = Filename;
+
+  replaceAll(Name, "/", "_");
+  replaceAll(Name, ".", "_");
+
+  OS << "<class name=\"" << Name << "\" filename=\"" << Filename << "\"";
   OS << " line-rate=\"";
   llvm::write_double(OS, FileReport.LineCoverage.getPercentCovered() / 100,
                      FloatStyle::Fixed, 5);
